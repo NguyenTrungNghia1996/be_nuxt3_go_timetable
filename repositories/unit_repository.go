@@ -61,12 +61,21 @@ func (r *UnitRepository) FindByID(ctx context.Context, id string) (*models.Unit,
 	return &unit, nil
 }
 
+func (r *UnitRepository) FindBySubDomain(ctx context.Context, subDomain string) (*models.Unit, error) {
+	var unit models.Unit
+	err := r.collection.FindOne(ctx, bson.M{"sub_domain": subDomain}).Decode(&unit)
+	if err != nil {
+		return nil, err
+	}
+	return &unit, nil
+}
+
 func (r *UnitRepository) Update(ctx context.Context, id string, unit *models.Unit) error {
 	objID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return err
 	}
-	update := bson.M{"$set": bson.M{"name": unit.Name, "domain": unit.Domain}}
+	update := bson.M{"$set": bson.M{"name": unit.Name, "sub_domain": unit.SubDomain}}
 	_, err = r.collection.UpdateByID(ctx, objID, update)
 	return err
 }

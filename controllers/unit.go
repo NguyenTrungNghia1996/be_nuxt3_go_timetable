@@ -5,6 +5,7 @@ import (
 	"go-fiber-api/repositories"
 
 	"github.com/gofiber/fiber/v2"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type UnitController struct {
@@ -22,6 +23,19 @@ func (ctrl *UnitController) Create(c *fiber.Ctx) error {
 			Status:  "error",
 			Message: "Invalid input",
 			Data:    nil,
+		})
+	}
+	if _, err := ctrl.Repo.FindBySubDomain(c.Context(), input.SubDomain); err == nil {
+		return c.Status(fiber.StatusBadRequest).JSON(models.APIResponse{
+			Status:  "error",
+			Message: "sub domain exists",
+			Data:    nil,
+		})
+	} else if err != mongo.ErrNoDocuments {
+		return c.Status(fiber.StatusInternalServerError).JSON(models.APIResponse{
+			Status:  "error",
+			Message: "Failed to create unit",
+			Data:    err.Error(),
 		})
 	}
 	if err := ctrl.Repo.Create(c.Context(), &input); err != nil {
@@ -99,6 +113,30 @@ func (ctrl *UnitController) Get(c *fiber.Ctx) error {
 	})
 }
 
+func (ctrl *UnitController) GetBySubDomain(c *fiber.Ctx) error {
+	sub := c.Query("sub_domain")
+	if sub == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(models.APIResponse{
+			Status:  "error",
+			Message: "Missing sub_domain",
+			Data:    nil,
+		})
+	}
+	unit, err := ctrl.Repo.FindBySubDomain(c.Context(), sub)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(models.APIResponse{
+			Status:  "error",
+			Message: "Unit not found",
+			Data:    nil,
+		})
+	}
+	return c.JSON(models.APIResponse{
+		Status:  "success",
+		Message: "Unit retrieved",
+		Data:    unit,
+	})
+}
+
 func (ctrl *UnitController) Update(c *fiber.Ctx) error {
 	id := c.Query("id")
 	if id == "" {
@@ -114,6 +152,19 @@ func (ctrl *UnitController) Update(c *fiber.Ctx) error {
 			Status:  "error",
 			Message: "Invalid input",
 			Data:    nil,
+		})
+	}
+	if u, err := ctrl.Repo.FindBySubDomain(c.Context(), input.SubDomain); err == nil && u.ID.Hex() != id {
+		return c.Status(fiber.StatusBadRequest).JSON(models.APIResponse{
+			Status:  "error",
+			Message: "sub domain exists",
+			Data:    nil,
+		})
+	} else if err != nil && err != mongo.ErrNoDocuments {
+		return c.Status(fiber.StatusInternalServerError).JSON(models.APIResponse{
+			Status:  "error",
+			Message: "Failed to update unit",
+			Data:    err.Error(),
 		})
 	}
 	if err := ctrl.Repo.Update(c.Context(), id, &input); err != nil {

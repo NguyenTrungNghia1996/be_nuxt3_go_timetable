@@ -169,7 +169,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Acme\",\n  \"domain\": \"acme.com\"\n}"
+              "raw": "{\n  \"name\": \"Acme\",\n  \"sub_domain\": \"acme\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/units",
@@ -214,6 +214,36 @@
           "response": []
         },
         {
+          "name": "Get Unit by SubDomain",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/units/by_subdomain?sub_domain=acme",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "units",
+                "by_subdomain"
+              ],
+              "query": [
+                {
+                  "key": "sub_domain",
+                  "value": "acme"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Update Unit",
           "request": {
             "method": "PUT",
@@ -229,7 +259,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Updated\",\n  \"domain\": \"updated.com\"\n}"
+              "raw": "{\n  \"name\": \"Updated\",\n  \"sub_domain\": \"updated\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/units?id=abcdef1234567890",
