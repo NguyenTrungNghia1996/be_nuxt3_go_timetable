@@ -45,7 +45,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\",\n  \"unit_id\": \"687f569bcd2015c348afcc27\"\n}"
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\",\n  \"sub_domain\": \"admin\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/login",

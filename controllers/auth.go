@@ -23,11 +23,11 @@ func NewAuthController(userRepo *repositories.UserRepository, unitRepo *reposito
 
 // Login authenticates a user and returns a signed JWT on success.
 func (ctrl *AuthController) Login(c *fiber.Ctx) error {
-	var input struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
-		UnitID   string `json:"unit_id"`
-	}
+       var input struct {
+               Username  string `json:"username"`
+               Password  string `json:"password"`
+               SubDomain string `json:"sub_domain"`
+       }
 	if err := c.BodyParser(&input); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(models.APIResponse{
 			Status:  "error",
@@ -36,30 +36,29 @@ func (ctrl *AuthController) Login(c *fiber.Ctx) error {
 		})
 	}
 
-	if input.UnitID == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(models.APIResponse{
-			Status:  "error",
-			Message: "Missing unit_id",
-			Data:    nil,
-		})
-	}
+       if input.SubDomain == "" {
+               return c.Status(fiber.StatusBadRequest).JSON(models.APIResponse{
+                       Status:  "error",
+                       Message: "Missing sub_domain",
+                       Data:    nil,
+               })
+       }
 
-	user, err := ctrl.UserRepo.FindByUsername(c.Context(), input.Username)
-	if err != nil || user.UnitID.Hex() != input.UnitID || !user.Active || !utils.CheckPasswordHash(input.Password, user.Password) {
-		return c.Status(fiber.StatusUnauthorized).JSON(models.APIResponse{
-			Status:  "error",
-			Message: "Invalid credentials",
-			Data:    nil,
-		})
-	}
-
-	unit, err := ctrl.UnitRepo.FindByID(c.Context(), input.UnitID)
-	if err != nil || !unit.Active {
-		return c.Status(fiber.StatusUnauthorized).JSON(models.APIResponse{
-			Status:  "error",
-			Message: "Invalid credentials",
-			Data:    nil,
-		})
+       user, err := ctrl.UserRepo.FindByUsername(c.Context(), input.Username)
+       if err != nil || !user.Active || !utils.CheckPasswordHash(input.Password, user.Password) {
+               return c.Status(fiber.StatusUnauthorized).JSON(models.APIResponse{
+                       Status:  "error",
+                       Message: "Invalid credentials",
+                       Data:    nil,
+               })
+       }
+       unit, err := ctrl.UnitRepo.FindBySubDomain(c.Context(), input.SubDomain)
+       if err != nil || !unit.Active || user.UnitID != unit.ID {
+               return c.Status(fiber.StatusUnauthorized).JSON(models.APIResponse{
+                       Status:  "error",
+                       Message: "Invalid credentials",
+                       Data:    nil,
+               })
 	}
 
 	token, _ := utils.GenerateJWT(user.ID.Hex())

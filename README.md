@@ -25,12 +25,12 @@ assumes two variables:
 The collection contains examples for logging in and obtaining presigned URLs
 for uploading images.
 
-When logging in, include the unit ID along with the username and password:
+When logging in, include the unit's sub-domain along with the username and password:
 
 ```json
 {
   "username": "admin",
   "password": "admin123",
-  "unit_id": "687f569bcd2015c348afcc27"
+  "sub_domain": "admin"
 }
 ```
