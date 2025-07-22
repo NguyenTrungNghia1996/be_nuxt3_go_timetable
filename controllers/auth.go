@@ -34,14 +34,14 @@ func (ctrl *AuthController) Login(c *fiber.Ctx) error {
 		})
 	}
 
-	user, err := ctrl.Repo.FindByUsername(c.Context(), input.Username)
-	if err != nil || !utils.CheckPasswordHash(input.Password, user.Password) {
-		return c.Status(fiber.StatusUnauthorized).JSON(models.APIResponse{
-			Status:  "error",
-			Message: "Invalid credentials",
-			Data:    nil,
-		})
-	}
+       user, err := ctrl.Repo.FindByUsername(c.Context(), input.Username)
+       if err != nil || !user.Active || !utils.CheckPasswordHash(input.Password, user.Password) {
+               return c.Status(fiber.StatusUnauthorized).JSON(models.APIResponse{
+                       Status:  "error",
+                       Message: "Invalid credentials",
+                       Data:    nil,
+               })
+       }
 
 	token, _ := utils.GenerateJWT(user.ID.Hex())
 	u := fiber.Map{

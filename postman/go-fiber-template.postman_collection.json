@@ -169,7 +169,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Acme\",\n  \"sub_domain\": \"acme\"\n}"
+              "raw": "{\n  \"name\": \"Acme\",\n  \"sub_domain\": \"acme\",\n  \"active\": true\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/units",
@@ -195,19 +195,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/units?id=abcdef1234567890",
+              "raw": "{{baseUrl}}/api/units",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
                 "units"
-              ],
-              "query": [
-                {
-                  "key": "id",
-                  "value": "abcdef1234567890"
-                }
               ]
             }
           },
@@ -259,22 +253,16 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Updated\",\n  \"sub_domain\": \"updated\"\n}"
+              "raw": "{\n  \"id\": \"abcdef1234567890\",\n  \"name\": \"Updated\",\n  \"sub_domain\": \"updated\",\n  \"active\": true\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/units?id=abcdef1234567890",
+              "raw": "{{baseUrl}}/api/units",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
                 "units"
-              ],
-              "query": [
-                {
-                  "key": "id",
-                  "value": "abcdef1234567890"
-                }
               ]
             }
           },

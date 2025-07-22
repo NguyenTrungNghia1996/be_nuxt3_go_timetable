@@ -20,12 +20,13 @@ func SeedAdminUser() {
 		return
 	}
 	password, _ := utils.HashPassword("admin123")
-	admin := models.User{
-		Username:  "admin",
-		Password:  password,
-		Name:      "Administrator",
-		UrlAvatar: "",
-	}
+       admin := models.User{
+               Username:  "admin",
+               Password:  password,
+               Name:      "Administrator",
+               UrlAvatar: "",
+               Active:    true,
+       }
 
 	_, err = collection.InsertOne(context.TODO(), admin)
 	if err != nil {
