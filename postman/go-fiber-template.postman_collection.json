@@ -208,15 +208,10 @@
           "response": []
         },
         {
-          "name": "Get Unit by SubDomain",
+          "name": "Check SubDomain",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/units/by_subdomain?sub_domain=acme",
               "host": [

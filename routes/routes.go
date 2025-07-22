@@ -18,6 +18,7 @@ func Setup(app *fiber.App, db *mongo.Database) {
 
 	// Public routes do not require authentication
 	app.Post("/login", authCtrl.Login)
+	app.Get("/api/units/by_subdomain", unitCtrl.GetBySubDomain)
 
 	// Protected API group requires JWT authentication
 	api := app.Group("/api", middleware.Protected())
@@ -27,7 +28,6 @@ func Setup(app *fiber.App, db *mongo.Database) {
 	units := api.Group("/units")
 	units.Get("", unitCtrl.List)
 	units.Post("", unitCtrl.Create)
-	units.Get("/by_subdomain", unitCtrl.GetBySubDomain)
 	units.Put("", unitCtrl.Update)
 	units.Delete("", unitCtrl.Delete)
 }

@@ -17,8 +17,8 @@ func NewUnitController(repo *repositories.UnitRepository) *UnitController {
 }
 
 func (ctrl *UnitController) Create(c *fiber.Ctx) error {
-        var input models.Unit
-        if err := c.BodyParser(&input); err != nil {
+	var input models.Unit
+	if err := c.BodyParser(&input); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(models.APIResponse{
 			Status:  "error",
 			Message: "Invalid input",
@@ -37,11 +37,11 @@ func (ctrl *UnitController) Create(c *fiber.Ctx) error {
 			Message: "Failed to create unit",
 			Data:    err.Error(),
 		})
-        }
-       if input.Active == false {
-               input.Active = true
-       }
-        if err := ctrl.Repo.Create(c.Context(), &input); err != nil {
+	}
+	if input.Active == false {
+		input.Active = true
+	}
+	if err := ctrl.Repo.Create(c.Context(), &input); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(models.APIResponse{
 			Status:  "error",
 			Message: "Failed to create unit",
@@ -125,44 +125,53 @@ func (ctrl *UnitController) GetBySubDomain(c *fiber.Ctx) error {
 			Data:    nil,
 		})
 	}
-	unit, err := ctrl.Repo.FindBySubDomain(c.Context(), sub)
-	if err != nil {
-		return c.Status(fiber.StatusNotFound).JSON(models.APIResponse{
-			Status:  "error",
-			Message: "Unit not found",
-			Data:    nil,
+
+	_, err := ctrl.Repo.FindBySubDomain(c.Context(), sub)
+	if err == mongo.ErrNoDocuments {
+		return c.JSON(models.APIResponse{
+			Status:  "success",
+			Message: "sub_domain available",
+			Data:    fiber.Map{"exists": false},
 		})
 	}
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(models.APIResponse{
+			Status:  "error",
+			Message: "Failed to check sub_domain",
+			Data:    err.Error(),
+		})
+	}
+
 	return c.JSON(models.APIResponse{
 		Status:  "success",
-		Message: "Unit retrieved",
-		Data:    unit,
+		Message: "sub_domain exists",
+		Data:    fiber.Map{"exists": true},
 	})
 }
 
 func (ctrl *UnitController) Update(c *fiber.Ctx) error {
-       var input models.Unit
-       if err := c.BodyParser(&input); err != nil {
-               return c.Status(fiber.StatusBadRequest).JSON(models.APIResponse{
-                       Status:  "error",
-                       Message: "Invalid input",
-                       Data:    nil,
-               })
-       }
-       if input.ID.IsZero() {
-               return c.Status(fiber.StatusBadRequest).JSON(models.APIResponse{
-                       Status:  "error",
-                       Message: "Missing id",
-                       Data:    nil,
-               })
-       }
-       id := input.ID.Hex()
+	var input models.Unit
+	if err := c.BodyParser(&input); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(models.APIResponse{
+			Status:  "error",
+			Message: "Invalid input",
+			Data:    nil,
+		})
+	}
+	if input.ID.IsZero() {
+		return c.Status(fiber.StatusBadRequest).JSON(models.APIResponse{
+			Status:  "error",
+			Message: "Missing id",
+			Data:    nil,
+		})
+	}
+	id := input.ID.Hex()
 
-       if u, err := ctrl.Repo.FindBySubDomain(c.Context(), input.SubDomain); err == nil && u.ID.Hex() != id {
-               return c.Status(fiber.StatusBadRequest).JSON(models.APIResponse{
-                       Status:  "error",
-                       Message: "sub domain exists",
-                       Data:    nil,
+	if u, err := ctrl.Repo.FindBySubDomain(c.Context(), input.SubDomain); err == nil && u.ID.Hex() != id {
+		return c.Status(fiber.StatusBadRequest).JSON(models.APIResponse{
+			Status:  "error",
+			Message: "sub domain exists",
+			Data:    nil,
 		})
 	} else if err != nil && err != mongo.ErrNoDocuments {
 		return c.Status(fiber.StatusInternalServerError).JSON(models.APIResponse{
@@ -171,11 +180,11 @@ func (ctrl *UnitController) Update(c *fiber.Ctx) error {
 			Data:    err.Error(),
 		})
 	}
-       if err := ctrl.Repo.Update(c.Context(), id, &input); err != nil {
-               return c.Status(fiber.StatusInternalServerError).JSON(models.APIResponse{
-                       Status:  "error",
-                       Message: "Failed to update unit",
-                       Data:    err.Error(),
+	if err := ctrl.Repo.Update(c.Context(), id, &input); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(models.APIResponse{
+			Status:  "error",
+			Message: "Failed to update unit",
+			Data:    err.Error(),
 		})
 	}
 	return c.JSON(models.APIResponse{
