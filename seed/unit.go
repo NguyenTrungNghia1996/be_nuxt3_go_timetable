@@ -15,11 +15,10 @@ import (
 func SeedDefaultUnit() primitive.ObjectID {
 	collection := config.DB.Collection("units")
 	var existing models.Unit
-	err := collection.FindOne(context.TODO(), bson.M{"code": "default"}).Decode(&existing)
+	err := collection.FindOne(context.TODO(), bson.M{"_id": DefaultUnitID}).Decode(&existing)
 	if err == mongo.ErrNoDocuments {
-		id := primitive.NewObjectID()
 		unit := models.Unit{
-			ID:   id,
+			ID:   DefaultUnitID,
 			Name: "Default Unit",
 			Code: "default",
 		}
@@ -28,7 +27,7 @@ func SeedDefaultUnit() primitive.ObjectID {
 			return primitive.NilObjectID
 		}
 		fmt.Println("🚀 Default unit seeded")
-		return id
+		return DefaultUnitID
 	} else if err == nil {
 		fmt.Println("✅ Default unit already exists")
 		return existing.ID

@@ -13,7 +13,7 @@ import (
 )
 
 // SeedRoleGroups seeds default role groups if they don't already exist.
-func SeedRoleGroups() {
+func SeedRoleGroups(unitID primitive.ObjectID) {
 	collection := config.DB.Collection("role_groups")
 
 	adminID, _ := primitive.ObjectIDFromHex("685d01ab5e17ba55d0e349f2")
@@ -26,6 +26,7 @@ func SeedRoleGroups() {
 			{Key: "menu-euoi92n7f0", PermissionValue: 0},
 			{Key: "menu-byy4w5x6la", PermissionValue: 42},
 		},
+		UnitID: unitID,
 	}
 
 	var existing models.RoleGroup

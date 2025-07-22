@@ -25,8 +25,8 @@ func main() {
 	config.ConnectDB()
 
 	// Seed default data
-	seed.SeedRoleGroups()
 	unitID := seed.SeedDefaultUnit()
+	seed.SeedRoleGroups(unitID)
 	seed.SeedAdminUser(unitID)
 	seed.SeedSAUser(unitID)
 	seed.SeedDefaultUser(unitID)
