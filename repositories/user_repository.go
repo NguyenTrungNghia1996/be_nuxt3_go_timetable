@@ -49,8 +49,8 @@ func (r *UserRepository) IsUsernameExists(ctx context.Context, username string) 
 
 // GetAll returns a paginated list of users filtered by username keyword.
 // It also returns the total number of matched documents for pagination.
-func (r *UserRepository) GetAll(ctx context.Context, search string, page, limit int64) ([]models.User, int64, error) {
-	filter := bson.M{}
+func (r *UserRepository) GetAll(ctx context.Context, unitID primitive.ObjectID, search string, page, limit int64) ([]models.User, int64, error) {
+	filter := bson.M{"unit_id": unitID}
 	if search != "" {
 		filter["username"] = bson.M{"$regex": search, "$options": "i"}
 	}
@@ -119,7 +119,7 @@ func (r *UserRepository) FindByID(ctx context.Context, id string) (*models.User,
 
 // UpdateByID updates the name, avatar URL, and role groups of a user by id and
 // returns the updated document. Username and password cannot be changed here.
-func (r *UserRepository) UpdateByID(ctx context.Context, id string, name string, urlAvatar string, roleGroups []primitive.ObjectID) (*models.User, error) {
+func (r *UserRepository) UpdateByID(ctx context.Context, unitID primitive.ObjectID, id string, name string, urlAvatar string, roleGroups []primitive.ObjectID) (*models.User, error) {
 	objID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
@@ -132,7 +132,7 @@ func (r *UserRepository) UpdateByID(ctx context.Context, id string, name string,
 
 	opts := options.FindOneAndUpdate().SetReturnDocument(options.After)
 	var updated models.User
-	err = r.collection.FindOneAndUpdate(ctx, bson.M{"_id": objID}, update, opts).Decode(&updated)
+	err = r.collection.FindOneAndUpdate(ctx, bson.M{"_id": objID, "unit_id": unitID}, update, opts).Decode(&updated)
 	if err == mongo.ErrNoDocuments {
 		return nil, errors.New("user not found")
 	}

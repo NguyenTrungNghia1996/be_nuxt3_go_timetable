@@ -25,8 +25,8 @@ func (r *MenuRepository) Create(ctx context.Context, menu *models.Menu) error {
 }
 
 // GetAll returns menus optionally filtered by a search keyword.
-func (r *MenuRepository) GetAll(ctx context.Context, search string) ([]models.Menu, error) {
-	filter := bson.M{}
+func (r *MenuRepository) GetAll(ctx context.Context, unitID primitive.ObjectID, search string) ([]models.Menu, error) {
+	filter := bson.M{"unit_id": unitID}
 	if search != "" {
 		filter["title"] = bson.M{"$regex": search, "$options": "i"}
 	}
@@ -48,12 +48,12 @@ func (r *MenuRepository) GetAll(ctx context.Context, search string) ([]models.Me
 	return menus, nil
 }
 
-func (r *MenuRepository) DeleteByID(ctx context.Context, id string) error {
+func (r *MenuRepository) DeleteByID(ctx context.Context, unitID primitive.ObjectID, id string) error {
 	objID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return err
 	}
-	res, err := r.collection.DeleteOne(ctx, bson.M{"_id": objID})
+	res, err := r.collection.DeleteOne(ctx, bson.M{"_id": objID, "unit_id": unitID})
 	if err != nil {
 		return err
 	}
@@ -63,7 +63,7 @@ func (r *MenuRepository) DeleteByID(ctx context.Context, id string) error {
 	return nil
 }
 
-func (r *MenuRepository) UpdateByID(ctx context.Context, id string, menu *models.Menu) error {
+func (r *MenuRepository) UpdateByID(ctx context.Context, unitID primitive.ObjectID, id string, menu *models.Menu) error {
 	objID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return err
@@ -78,7 +78,7 @@ func (r *MenuRepository) UpdateByID(ctx context.Context, id string, menu *models
 		"permissionBit": menu.PermissionBit,
 	}}
 
-	res, err := r.collection.UpdateOne(ctx, bson.M{"_id": objID}, update)
+	res, err := r.collection.UpdateOne(ctx, bson.M{"_id": objID, "unit_id": unitID}, update)
 	if err != nil {
 		return err
 	}

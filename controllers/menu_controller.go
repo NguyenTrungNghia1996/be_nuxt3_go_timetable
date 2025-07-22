@@ -5,6 +5,8 @@ import (
 	"go-fiber-api/repositories"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v4"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type MenuController struct {
@@ -25,6 +27,11 @@ func (ctrl *MenuController) CreateMenu(c *fiber.Ctx) error {
 		})
 	}
 
+	token := c.Locals("user").(*jwt.Token)
+	claims := token.Claims.(jwt.MapClaims)
+	unitIDHex, _ := claims["unit_id"].(string)
+	menu.UnitID, _ = primitive.ObjectIDFromHex(unitIDHex)
+
 	if err := ctrl.Repo.Create(c.Context(), &menu); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(models.APIResponse{
 			Status:  "error",
@@ -42,7 +49,12 @@ func (ctrl *MenuController) CreateMenu(c *fiber.Ctx) error {
 
 func (ctrl *MenuController) GetMenus(c *fiber.Ctx) error {
 	search := c.Query("search")
-	menus, err := ctrl.Repo.GetAll(c.Context(), search)
+	token := c.Locals("user").(*jwt.Token)
+	claims := token.Claims.(jwt.MapClaims)
+	unitIDHex, _ := claims["unit_id"].(string)
+	uid, _ := primitive.ObjectIDFromHex(unitIDHex)
+
+	menus, err := ctrl.Repo.GetAll(c.Context(), uid, search)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(models.APIResponse{
 			Status:  "error",
@@ -73,7 +85,12 @@ func (ctrl *MenuController) DeleteMenu(c *fiber.Ctx) error {
 		})
 	}
 
-	if err := ctrl.Repo.DeleteByID(c.Context(), id); err != nil {
+	token := c.Locals("user").(*jwt.Token)
+	claims := token.Claims.(jwt.MapClaims)
+	unitIDHex, _ := claims["unit_id"].(string)
+	uid, _ := primitive.ObjectIDFromHex(unitIDHex)
+
+	if err := ctrl.Repo.DeleteByID(c.Context(), uid, id); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(models.APIResponse{
 			Status:  "error",
 			Message: err.Error(),
@@ -106,7 +123,12 @@ func (ctrl *MenuController) UpdateMenu(c *fiber.Ctx) error {
 		})
 	}
 
-	if err := ctrl.Repo.UpdateByID(c.Context(), menu.ID.Hex(), &menu); err != nil {
+	token := c.Locals("user").(*jwt.Token)
+	claims := token.Claims.(jwt.MapClaims)
+	unitIDHex, _ := claims["unit_id"].(string)
+	uid, _ := primitive.ObjectIDFromHex(unitIDHex)
+
+	if err := ctrl.Repo.UpdateByID(c.Context(), uid, menu.ID.Hex(), &menu); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(models.APIResponse{
 			Status:  "error",
 			Message: err.Error(),

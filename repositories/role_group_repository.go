@@ -19,13 +19,13 @@ func NewRoleGroupRepository(db *mongo.Database) *RoleGroupRepository {
 	return &RoleGroupRepository{collection: db.Collection("role_groups")}
 }
 
-func (r *RoleGroupRepository) GetByID(ctx context.Context, id string) (*models.RoleGroup, error) {
+func (r *RoleGroupRepository) GetByID(ctx context.Context, unitID primitive.ObjectID, id string) (*models.RoleGroup, error) {
 	objID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
 	}
 	var group models.RoleGroup
-	err = r.collection.FindOne(ctx, bson.M{"_id": objID}).Decode(&group)
+	err = r.collection.FindOne(ctx, bson.M{"_id": objID, "unit_id": unitID}).Decode(&group)
 	if err == mongo.ErrNoDocuments {
 		return nil, errors.New("role group not found")
 	}
@@ -65,8 +65,8 @@ func (r *RoleGroupRepository) GetByIDs(ctx context.Context, ids []primitive.Obje
 	return groups, nil
 }
 
-func (r *RoleGroupRepository) GetAll(ctx context.Context, search string, page, limit int64) ([]models.RoleGroup, int64, error) {
-	filter := bson.M{}
+func (r *RoleGroupRepository) GetAll(ctx context.Context, unitID primitive.ObjectID, search string, page, limit int64) ([]models.RoleGroup, int64, error) {
+	filter := bson.M{"unit_id": unitID}
 	if search != "" {
 		filter["name"] = bson.M{"$regex": search, "$options": "i"}
 	}
@@ -105,7 +105,7 @@ func (r *RoleGroupRepository) UpdateByID(ctx context.Context, id string, group *
 		"description": group.Description,
 		"permission":  group.Permission,
 	}}
-	res, err := r.collection.UpdateOne(ctx, bson.M{"_id": objID}, update)
+	res, err := r.collection.UpdateOne(ctx, bson.M{"_id": objID, "unit_id": group.UnitID}, update)
 	if err != nil {
 		return err
 	}
@@ -116,12 +116,12 @@ func (r *RoleGroupRepository) UpdateByID(ctx context.Context, id string, group *
 	return nil
 }
 
-func (r *RoleGroupRepository) DeleteByID(ctx context.Context, id string) error {
+func (r *RoleGroupRepository) DeleteByID(ctx context.Context, unitID primitive.ObjectID, id string) error {
 	objID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return err
 	}
-	res, err := r.collection.DeleteOne(ctx, bson.M{"_id": objID})
+	res, err := r.collection.DeleteOne(ctx, bson.M{"_id": objID, "unit_id": unitID})
 	if err != nil {
 		return err
 	}

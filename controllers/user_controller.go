@@ -35,6 +35,12 @@ func (ctrl *UserController) CreateUser(c *fiber.Ctx) error {
 		})
 	}
 
+	token := c.Locals("user").(*jwt.Token)
+	claims := token.Claims.(jwt.MapClaims)
+	unitIDHex, _ := claims["unit_id"].(string)
+	uid, _ := primitive.ObjectIDFromHex(unitIDHex)
+	user.UnitID = uid
+
 	// Check username exists
 	exists, err := ctrl.Repo.IsUsernameExists(c.Context(), user.Username)
 	if err != nil {
@@ -99,7 +105,12 @@ func (ctrl *UserController) GetUsers(c *fiber.Ctx) error {
 	page, _ := strconv.ParseInt(c.Query("page", "1"), 10, 64)
 	limit, _ := strconv.ParseInt(c.Query("limit", "10"), 10, 64)
 
-	users, total, err := ctrl.Repo.GetAll(c.Context(), search, page, limit)
+	token := c.Locals("user").(*jwt.Token)
+	claims := token.Claims.(jwt.MapClaims)
+	unitIDHex, _ := claims["unit_id"].(string)
+	unitID, _ := primitive.ObjectIDFromHex(unitIDHex)
+
+	users, total, err := ctrl.Repo.GetAll(c.Context(), unitID, search, page, limit)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(models.APIResponse{
 			Status:  "error",
@@ -227,7 +238,12 @@ func (ctrl *UserController) UpdateUser(c *fiber.Ctx) error {
 		})
 	}
 
-	user, err := ctrl.Repo.UpdateByID(c.Context(), req.ID.Hex(), req.Name, req.UrlAvatar, req.RoleGroups)
+	token := c.Locals("user").(*jwt.Token)
+	claims := token.Claims.(jwt.MapClaims)
+	unitIDHex, _ := claims["unit_id"].(string)
+	unitID, _ := primitive.ObjectIDFromHex(unitIDHex)
+
+	user, err := ctrl.Repo.UpdateByID(c.Context(), unitID, req.ID.Hex(), req.Name, req.UrlAvatar, req.RoleGroups)
 	if err != nil {
 		status := fiber.StatusInternalServerError
 		if err.Error() == "user not found" {
@@ -296,62 +312,65 @@ func (ctrl *UserController) GetCurrentUser(c *fiber.Ctx) error {
 
 // UpdateCurrentUser handles PUT /api/me to update the authenticated user's profile
 func (ctrl *UserController) UpdateCurrentUser(c *fiber.Ctx) error {
-       var req struct {
-               Name      string `json:"name"`
-               UrlAvatar string `json:"url_avatar"`
-       }
-       if err := c.BodyParser(&req); err != nil {
-               return c.Status(fiber.StatusBadRequest).JSON(models.APIResponse{
-                       Status:  "error",
-                       Message: "Invalid data",
-                       Data:    nil,
-               })
-       }
+	var req struct {
+		Name      string `json:"name"`
+		UrlAvatar string `json:"url_avatar"`
+	}
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(models.APIResponse{
+			Status:  "error",
+			Message: "Invalid data",
+			Data:    nil,
+		})
+	}
 
-       token := c.Locals("user").(*jwt.Token)
-       claims := token.Claims.(jwt.MapClaims)
-       id, _ := claims["id"].(string)
+	token := c.Locals("user").(*jwt.Token)
+	claims := token.Claims.(jwt.MapClaims)
+	id, _ := claims["id"].(string)
 
-       current, err := ctrl.Repo.FindByID(c.Context(), id)
-       if err != nil {
-               return c.Status(fiber.StatusNotFound).JSON(models.APIResponse{
-                       Status:  "error",
-                       Message: "User not found",
-                       Data:    nil,
-               })
-       }
+	current, err := ctrl.Repo.FindByID(c.Context(), id)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(models.APIResponse{
+			Status:  "error",
+			Message: "User not found",
+			Data:    nil,
+		})
+	}
 
-       user, err := ctrl.Repo.UpdateByID(c.Context(), id, req.Name, req.UrlAvatar, current.RoleGroups)
-       if err != nil {
-               status := fiber.StatusInternalServerError
-               if err.Error() == "user not found" {
-                       status = fiber.StatusNotFound
-               }
-               return c.Status(status).JSON(models.APIResponse{
-                       Status:  "error",
-                       Message: err.Error(),
-                       Data:    nil,
-               })
-       }
-       user.Password = ""
-       groups, err := ctrl.RoleGroupRepo.GetByIDs(c.Context(), user.RoleGroups)
-       if err != nil {
-               return c.Status(fiber.StatusInternalServerError).JSON(models.APIResponse{
-                       Status:  "error",
-                       Message: "Cannot get role groups",
-                       Data:    nil,
-               })
-       }
-       gm := make(map[primitive.ObjectID]models.RoleGroupListItem, len(groups))
-       for _, g := range groups {
-               gm[g.ID] = g.ToListItem()
-       }
+	unitIDHex, _ := claims["unit_id"].(string)
+	unitID, _ := primitive.ObjectIDFromHex(unitIDHex)
 
-       return c.JSON(models.APIResponse{
-               Status:  "success",
-               Message: "Updated profile successfully",
-               Data:    user.ToListItem(gm),
-       })
+	user, err := ctrl.Repo.UpdateByID(c.Context(), unitID, id, req.Name, req.UrlAvatar, current.RoleGroups)
+	if err != nil {
+		status := fiber.StatusInternalServerError
+		if err.Error() == "user not found" {
+			status = fiber.StatusNotFound
+		}
+		return c.Status(status).JSON(models.APIResponse{
+			Status:  "error",
+			Message: err.Error(),
+			Data:    nil,
+		})
+	}
+	user.Password = ""
+	groups, err := ctrl.RoleGroupRepo.GetByIDs(c.Context(), user.RoleGroups)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(models.APIResponse{
+			Status:  "error",
+			Message: "Cannot get role groups",
+			Data:    nil,
+		})
+	}
+	gm := make(map[primitive.ObjectID]models.RoleGroupListItem, len(groups))
+	for _, g := range groups {
+		gm[g.ID] = g.ToListItem()
+	}
+
+	return c.JSON(models.APIResponse{
+		Status:  "success",
+		Message: "Updated profile successfully",
+		Data:    user.ToListItem(gm),
+	})
 }
 
 // GetUserPermissions aggregates permissions from the user's role groups.

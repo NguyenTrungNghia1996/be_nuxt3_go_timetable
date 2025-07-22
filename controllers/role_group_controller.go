@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v4"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -26,7 +27,11 @@ func (ctrl *RoleGroupController) GetRoleGroupDetail(c *fiber.Ctx) error {
 			Data:    nil,
 		})
 	}
-	group, err := ctrl.Repo.GetByID(c.Context(), id)
+	token := c.Locals("user").(*jwt.Token)
+	claims := token.Claims.(jwt.MapClaims)
+	unitIDHex, _ := claims["unit_id"].(string)
+	uid, _ := primitive.ObjectIDFromHex(unitIDHex)
+	group, err := ctrl.Repo.GetByID(c.Context(), uid, id)
 	if err != nil {
 		status := fiber.StatusInternalServerError
 		if err.Error() == "role group not found" {
@@ -58,10 +63,15 @@ func (ctrl *RoleGroupController) CreateRoleGroup(c *fiber.Ctx) error {
 			Data:    nil,
 		})
 	}
+	token := c.Locals("user").(*jwt.Token)
+	claims := token.Claims.(jwt.MapClaims)
+	unitIDHex, _ := claims["unit_id"].(string)
+	uid, _ := primitive.ObjectIDFromHex(unitIDHex)
 	group := models.RoleGroup{
 		Name:        req.Name,
 		Description: req.Description,
 		Permission:  req.Permission,
+		UnitID:      uid,
 	}
 	if err := ctrl.Repo.Create(c.Context(), &group); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(models.APIResponse{
@@ -82,7 +92,12 @@ func (ctrl *RoleGroupController) GetRoleGroups(c *fiber.Ctx) error {
 	page, _ := strconv.ParseInt(c.Query("page", "1"), 10, 64)
 	limit, _ := strconv.ParseInt(c.Query("limit", "10"), 10, 64)
 
-	groups, total, err := ctrl.Repo.GetAll(c.Context(), search, page, limit)
+	token := c.Locals("user").(*jwt.Token)
+	claims := token.Claims.(jwt.MapClaims)
+	unitIDHex, _ := claims["unit_id"].(string)
+	uid, _ := primitive.ObjectIDFromHex(unitIDHex)
+
+	groups, total, err := ctrl.Repo.GetAll(c.Context(), uid, search, page, limit)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(models.APIResponse{
 			Status:  "error",
@@ -118,10 +133,15 @@ func (ctrl *RoleGroupController) UpdateRoleGroup(c *fiber.Ctx) error {
 			Data:    nil,
 		})
 	}
+	token := c.Locals("user").(*jwt.Token)
+	claims := token.Claims.(jwt.MapClaims)
+	unitIDHex, _ := claims["unit_id"].(string)
+	uid, _ := primitive.ObjectIDFromHex(unitIDHex)
 	group := models.RoleGroup{
 		Name:        req.Name,
 		Description: req.Description,
 		Permission:  req.Permission,
+		UnitID:      uid,
 	}
 	if err := ctrl.Repo.UpdateByID(c.Context(), req.ID, &group); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(models.APIResponse{
@@ -147,7 +167,12 @@ func (ctrl *RoleGroupController) DeleteRoleGroup(c *fiber.Ctx) error {
 			Data:    nil,
 		})
 	}
-	if err := ctrl.Repo.DeleteByID(c.Context(), id); err != nil {
+	token := c.Locals("user").(*jwt.Token)
+	claims := token.Claims.(jwt.MapClaims)
+	unitIDHex, _ := claims["unit_id"].(string)
+	uid, _ := primitive.ObjectIDFromHex(unitIDHex)
+
+	if err := ctrl.Repo.DeleteByID(c.Context(), uid, id); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(models.APIResponse{
 			Status:  "error",
 			Message: err.Error(),

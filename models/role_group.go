@@ -14,6 +14,7 @@ type RoleGroup struct {
 	Name        string             `json:"name" bson:"name"`
 	Description string             `json:"description" bson:"description"`
 	Permission  []PermissionDetail `json:"permission" bson:"permission"`
+	UnitID      primitive.ObjectID `json:"unit_id" bson:"unit_id"`
 }
 
 // RoleGroupResponse is used when returning role groups to clients.
@@ -22,6 +23,7 @@ type RoleGroupResponse struct {
 	Name        string             `json:"name"`
 	Description string             `json:"description"`
 	Permission  []PermissionDetail `json:"permission"`
+	UnitID      string             `json:"unit_id"`
 }
 
 // RoleGroupListItem is a lightweight representation used when listing groups.
@@ -29,6 +31,7 @@ type RoleGroupListItem struct {
 	ID          string `json:"id"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
+	UnitID      string `json:"unit_id"`
 }
 
 // ToResponse converts a RoleGroup to RoleGroupResponse.
@@ -38,6 +41,7 @@ func (r RoleGroup) ToResponse() RoleGroupResponse {
 		Name:        r.Name,
 		Description: r.Description,
 		Permission:  r.Permission,
+		UnitID:      r.UnitID.Hex(),
 	}
 }
 
@@ -47,5 +51,6 @@ func (r RoleGroup) ToListItem() RoleGroupListItem {
 		ID:          r.ID.Hex(),
 		Name:        r.Name,
 		Description: r.Description,
+		UnitID:      r.UnitID.Hex(),
 	}
 }

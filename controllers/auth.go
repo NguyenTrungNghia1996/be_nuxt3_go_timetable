@@ -59,7 +59,7 @@ func (ctrl *AuthController) Login(c *fiber.Ctx) error {
 		gm[g.ID] = g.ToListItem()
 	}
 
-	token, _ := utils.GenerateJWT(user.ID.Hex())
+        token, _ := utils.GenerateJWT(user.ID.Hex(), user.UnitID.Hex())
 	return c.JSON(models.APIResponse{
 		Status:  "success",
 		Message: "Login successful",

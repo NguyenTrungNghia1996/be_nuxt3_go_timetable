@@ -17,6 +17,8 @@ func Setup(app *fiber.App, db *mongo.Database) {
 	authCtrl := controllers.NewAuthController(userRepo, roleGroupRepo)
 	menuRepo := repositories.NewMenuRepository(db)
 	menuCtrl := controllers.NewMenuController(menuRepo)
+	unitRepo := repositories.NewUnitRepository(db)
+	unitCtrl := controllers.NewUnitController(unitRepo)
 	roleGroupCtrl := controllers.NewRoleGroupController(roleGroupRepo)
 
 	// Public routes do not require authentication
@@ -46,6 +48,12 @@ func Setup(app *fiber.App, db *mongo.Database) {
 	menuAdmin.Put("/", menuCtrl.UpdateMenu)
 	menuAdmin.Get("/", menuCtrl.GetMenus)
 	menuAdmin.Delete("/", menuCtrl.DeleteMenu)
+
+	unitAdmin := api.Group("/units")
+	unitAdmin.Post("/", unitCtrl.CreateUnit)
+	unitAdmin.Put("/", unitCtrl.UpdateUnit)
+	unitAdmin.Get("/", unitCtrl.GetUnits)
+	unitAdmin.Delete("/", unitCtrl.DeleteUnit)
 
 	roleGroupAdmin := api.Group("/role-groups")
 	roleGroupAdmin.Post("/", roleGroupCtrl.CreateRoleGroup)

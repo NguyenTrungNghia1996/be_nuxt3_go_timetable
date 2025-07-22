@@ -18,10 +18,11 @@ func CheckPasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
 }
-func GenerateJWT(id string) (string, error) {
+func GenerateJWT(id string, unitID string) (string, error) {
 	claims := jwt.MapClaims{
-		"id":  id,
-		"exp": time.Now().Add(12 * time.Hour).Unix(), // Hết hạn sau 12 giờ
+		"id":      id,
+		"unit_id": unitID,
+		"exp":     time.Now().Add(12 * time.Hour).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

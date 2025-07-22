@@ -12,7 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func SeedAdminUser() {
+func SeedAdminUser(unitID primitive.ObjectID) {
 	collection := config.DB.Collection("users")
 	var existing models.User
 	err := collection.FindOne(context.TODO(), bson.M{"username": "admin"}).Decode(&existing)
@@ -28,6 +28,7 @@ func SeedAdminUser() {
 		Name:       "Administrator",
 		UrlAvatar:  "",
 		RoleGroups: []primitive.ObjectID{groupID},
+		UnitID:     unitID,
 	}
 
 	_, err = collection.InsertOne(context.TODO(), admin)
@@ -39,7 +40,7 @@ func SeedAdminUser() {
 }
 
 // SeedDefaultUser creates a regular user account if not already present.
-func SeedDefaultUser() {
+func SeedDefaultUser(unitID primitive.ObjectID) {
 	collection := config.DB.Collection("users")
 	var existing models.User
 	err := collection.FindOne(context.TODO(), bson.M{"username": "user"}).Decode(&existing)
@@ -54,6 +55,7 @@ func SeedDefaultUser() {
 		Name:       "Default User",
 		UrlAvatar:  "",
 		RoleGroups: []primitive.ObjectID{},
+		UnitID:     unitID,
 	}
 
 	_, err = collection.InsertOne(context.TODO(), user)
@@ -62,4 +64,34 @@ func SeedDefaultUser() {
 		return
 	}
 	fmt.Println("🚀 Regular user seeded successfully: username=user password=user123")
+}
+
+// SeedSAUser creates a super admin tied to the provided unit.
+func SeedSAUser(unitID primitive.ObjectID) {
+	if unitID.IsZero() {
+		fmt.Println("❌ Cannot seed SA user without unit")
+		return
+	}
+	collection := config.DB.Collection("users")
+	var existing models.User
+	err := collection.FindOne(context.TODO(), bson.M{"username": "sa"}).Decode(&existing)
+	if err != mongo.ErrNoDocuments {
+		fmt.Println("✅ SA user already exists")
+		return
+	}
+	password, _ := utils.HashPassword("sa123")
+	groupID, _ := primitive.ObjectIDFromHex("685d01ab5e17ba55d0e349f2")
+	sa := models.User{
+		Username:   "sa",
+		Password:   password,
+		Name:       "Super Admin",
+		UrlAvatar:  "",
+		RoleGroups: []primitive.ObjectID{groupID},
+		UnitID:     unitID,
+	}
+	if _, err := collection.InsertOne(context.TODO(), sa); err != nil {
+		fmt.Println("❌ Failed to seed SA user:", err)
+		return
+	}
+	fmt.Println("🚀 SA user seeded successfully: username=sa password=sa123")
 }

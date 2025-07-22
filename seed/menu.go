@@ -13,7 +13,7 @@ import (
 )
 
 // SeedMenus inserts default menu entries if they do not exist.
-func SeedMenus() {
+func SeedMenus(unitID primitive.ObjectID) {
 	collection := config.DB.Collection("menus")
 
 	menus := []models.Menu{}
@@ -27,6 +27,7 @@ func SeedMenus() {
 		Icon:          "ant-design:dashboard-outlined",
 		ParentID:      primitive.NilObjectID,
 		PermissionBit: 0,
+		UnitID:        unitID,
 	})
 
 	id2, _ := primitive.ObjectIDFromHex("685d058f394165c3d5a0c626")
@@ -38,6 +39,7 @@ func SeedMenus() {
 		Icon:          "ant-design:user-outlined",
 		ParentID:      primitive.NilObjectID,
 		PermissionBit: 2,
+		UnitID:        unitID,
 	})
 
 	id3, _ := primitive.ObjectIDFromHex("685d05d3394165c3d5a0c627")
@@ -49,6 +51,7 @@ func SeedMenus() {
 		Icon:          "ant-design:menu-outlined",
 		ParentID:      id2,
 		PermissionBit: 0,
+		UnitID:        unitID,
 	})
 
 	id4, _ := primitive.ObjectIDFromHex("685d0d98ba911d2a1d9f40ea")
@@ -60,6 +63,7 @@ func SeedMenus() {
 		Icon:          "ant-design:safety-outlined",
 		ParentID:      id2,
 		PermissionBit: 2,
+		UnitID:        unitID,
 	})
 
 	id5, _ := primitive.ObjectIDFromHex("685e0007bd9eb34fceea7f4c")
@@ -71,6 +75,7 @@ func SeedMenus() {
 		Icon:          "ant-design:user-outlined",
 		ParentID:      id2,
 		PermissionBit: 4,
+		UnitID:        unitID,
 	})
 
 	for _, m := range menus {

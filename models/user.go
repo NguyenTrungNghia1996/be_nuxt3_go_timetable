@@ -10,6 +10,7 @@ type User struct {
 	Name       string               `json:"name" bson:"name"`
 	UrlAvatar  string               `json:"url_avatar" bson:"url_avatar"`
 	RoleGroups []primitive.ObjectID `json:"role_groups" bson:"role_groups"`
+	UnitID     primitive.ObjectID   `json:"unit_id" bson:"unit_id"`
 }
 
 // UserListItem represents a user with role group details populated.
@@ -19,6 +20,7 @@ type UserListItem struct {
 	Name       string              `json:"name"`
 	UrlAvatar  string              `json:"url_avatar"`
 	RoleGroups []RoleGroupListItem `json:"role_groups"`
+	UnitID     string              `json:"unit_id"`
 }
 
 // ToListItem converts a User to UserListItem with role group details.
@@ -35,5 +37,6 @@ func (u User) ToListItem(groups map[primitive.ObjectID]RoleGroupListItem) UserLi
 		Name:       u.Name,
 		UrlAvatar:  u.UrlAvatar,
 		RoleGroups: rg,
+		UnitID:     u.UnitID.Hex(),
 	}
 }
