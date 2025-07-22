@@ -3,7 +3,6 @@ package main
 import (
 	"go-fiber-api/config"
 	"go-fiber-api/routes"
-	"go-fiber-api/seed"
 	"log"
 	"os"
 
@@ -23,13 +22,6 @@ func main() {
 
 	// Kết nối MongoDB một lần duy nhất
 	config.ConnectDB()
-
-	// Seed default accounts if needed
-	seed.SeedRoleGroups()
-	seed.SeedAdminUser()
-	// seed.SeedDefaultUser()
-	seed.SeedMenus()
-
 	app := fiber.New()
 	app.Use(cors.New())
 	routes.Setup(app, config.DB)
