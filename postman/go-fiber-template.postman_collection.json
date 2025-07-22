@@ -281,5 +281,16 @@
         }
       ]
     }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "localhost:4000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
   ]
 }
