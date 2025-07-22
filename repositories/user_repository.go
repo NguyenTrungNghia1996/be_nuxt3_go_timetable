@@ -116,28 +116,3 @@ func (r *UserRepository) FindByID(ctx context.Context, id string) (*models.User,
 	}
 	return &user, nil
 }
-
-// UpdateByID updates the name, avatar URL, and role groups of a user by id and
-// returns the updated document. Username and password cannot be changed here.
-func (r *UserRepository) UpdateByID(ctx context.Context, id string, name string, urlAvatar string, roleGroups []primitive.ObjectID) (*models.User, error) {
-	objID, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return nil, err
-	}
-	update := bson.M{"$set": bson.M{
-		"name":        name,
-		"url_avatar":  urlAvatar,
-		"role_groups": roleGroups,
-	}}
-
-	opts := options.FindOneAndUpdate().SetReturnDocument(options.After)
-	var updated models.User
-	err = r.collection.FindOneAndUpdate(ctx, bson.M{"_id": objID}, update, opts).Decode(&updated)
-	if err == mongo.ErrNoDocuments {
-		return nil, errors.New("user not found")
-	}
-	if err != nil {
-		return nil, err
-	}
-	return &updated, nil
-}

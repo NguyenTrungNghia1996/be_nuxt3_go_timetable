@@ -1,10 +1,8 @@
 # Go Fiber Template
 
-This project provides a starting point for building REST APIs with
-[Fiber](https://github.com/gofiber/fiber). It includes basic user
-authentication and MongoDB integration.
-Users now store a `name` field and belong to role groups for authorization.
-Admins can manage role groups with dedicated CRUD endpoints.
+This project provides a minimal REST API built with
+[Fiber](https://github.com/gofiber/fiber). Only user login and image
+uploads to an S3 compatible service remain.
 
 ## Running locally
 
@@ -24,5 +22,5 @@ assumes two variables:
 - `baseUrl` – base address of your running server, e.g. `http://localhost:4000`
 - `token` – JWT obtained from the `Login` request
 
-The collection contains examples for logging in, retrieving and updating the
-current user, and managing users as an admin.
+The collection contains examples for logging in and obtaining presigned URLs
+for uploading images.

@@ -8,7 +8,6 @@ import (
 	"go-fiber-api/utils"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -21,13 +20,11 @@ func SeedAdminUser() {
 		return
 	}
 	password, _ := utils.HashPassword("admin123")
-	groupID, _ := primitive.ObjectIDFromHex("685d01ab5e17ba55d0e349f2")
 	admin := models.User{
-		Username:   "admin",
-		Password:   password,
-		Name:       "Administrator",
-		UrlAvatar:  "",
-		RoleGroups: []primitive.ObjectID{groupID},
+		Username:  "admin",
+		Password:  password,
+		Name:      "Administrator",
+		UrlAvatar: "",
 	}
 
 	_, err = collection.InsertOne(context.TODO(), admin)
@@ -48,13 +45,12 @@ func SeedAdminUser() {
 // 		return
 // 	}
 // 	password, _ := utils.HashPassword("user123")
-// 	user := models.User{
-// 		Username:   "user",
-// 		Password:   password,
-// 		Name:       "Default User",
-// 		UrlAvatar:  "",
-// 		RoleGroups: []primitive.ObjectID{},
-// 	}
+//      user := models.User{
+//              Username:  "user",
+//              Password:  password,
+//              Name:      "Default User",
+//              UrlAvatar: "",
+//      }
 
 // 	_, err = collection.InsertOne(context.TODO(), user)
 // 	if err != nil {

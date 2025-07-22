@@ -12,45 +12,13 @@ import (
 func Setup(app *fiber.App, db *mongo.Database) {
 	// Initialize repositories and controllers once so they can be reused
 	userRepo := repositories.NewUserRepository(db)
-	roleGroupRepo := repositories.NewRoleGroupRepository(db)
-	userCtrl := controllers.NewUserController(userRepo, roleGroupRepo)
-	authCtrl := controllers.NewAuthController(userRepo, roleGroupRepo)
-	menuRepo := repositories.NewMenuRepository(db)
-	menuCtrl := controllers.NewMenuController(menuRepo)
-	roleGroupCtrl := controllers.NewRoleGroupController(roleGroupRepo)
+	authCtrl := controllers.NewAuthController(userRepo)
 
 	// Public routes do not require authentication
 	app.Post("/login", authCtrl.Login)
-	app.Get("/test", controllers.Hello)
 
 	// Protected API group requires JWT authentication
 	api := app.Group("/api", middleware.Protected())
-	api.Get("/test2", controllers.Hello)
-
-	// Endpoints accessible to any authenticated user
-	api.Get("/me", userCtrl.GetCurrentUser)
-	api.Put("/me", userCtrl.UpdateCurrentUser)
-	api.Get("/permissions", userCtrl.GetUserPermissions)
-	api.Put("/users/password", userCtrl.ChangeUserPassword)
 	api.Put("/presigned_url", controllers.GetUploadUrl)
 	api.Delete("/image", controllers.DeleteImage)
-
-	// Admin-only routes are nested under /api/users
-	admin := api.Group("/users")
-	admin.Post("/", userCtrl.CreateUser)
-	admin.Get("/", userCtrl.GetUsers)
-	admin.Put("/", userCtrl.UpdateUser)
-
-	menuAdmin := api.Group("/menus")
-	menuAdmin.Post("/", menuCtrl.CreateMenu)
-	menuAdmin.Put("/", menuCtrl.UpdateMenu)
-	menuAdmin.Get("/", menuCtrl.GetMenus)
-	menuAdmin.Delete("/", menuCtrl.DeleteMenu)
-
-	roleGroupAdmin := api.Group("/role-groups")
-	roleGroupAdmin.Post("/", roleGroupCtrl.CreateRoleGroup)
-	roleGroupAdmin.Put("/", roleGroupCtrl.UpdateRoleGroup)
-	roleGroupAdmin.Get("/detail", roleGroupCtrl.GetRoleGroupDetail)
-	roleGroupAdmin.Get("/", roleGroupCtrl.GetRoleGroups)
-	roleGroupAdmin.Delete("/", roleGroupCtrl.DeleteRoleGroup)
 }
