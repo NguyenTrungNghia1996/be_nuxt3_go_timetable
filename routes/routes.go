@@ -12,8 +12,8 @@ import (
 func Setup(app *fiber.App, db *mongo.Database) {
 	// Initialize repositories and controllers once so they can be reused
 	userRepo := repositories.NewUserRepository(db)
-	authCtrl := controllers.NewAuthController(userRepo)
 	unitRepo := repositories.NewUnitRepository(db)
+	authCtrl := controllers.NewAuthController(userRepo, unitRepo)
 	unitCtrl := controllers.NewUnitController(unitRepo)
 
 	// Public routes do not require authentication
