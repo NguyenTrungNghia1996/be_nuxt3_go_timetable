@@ -66,12 +66,8 @@ func SeedDefaultUser(unitID primitive.ObjectID) {
 	fmt.Println("🚀 Regular user seeded successfully: username=user password=user123")
 }
 
-// SeedSAUser creates a super admin tied to the provided unit.
+// SeedSAUser creates a super admin not tied to any unit.
 func SeedSAUser(unitID primitive.ObjectID) {
-	if unitID.IsZero() {
-		fmt.Println("❌ Cannot seed SA user without unit")
-		return
-	}
 	collection := config.DB.Collection("users")
 	var existing models.User
 	err := collection.FindOne(context.TODO(), bson.M{"username": "sa"}).Decode(&existing)
@@ -87,7 +83,7 @@ func SeedSAUser(unitID primitive.ObjectID) {
 		Name:       "Super Admin",
 		UrlAvatar:  "",
 		RoleGroups: []primitive.ObjectID{groupID},
-		UnitID:     unitID,
+		UnitID:     primitive.NilObjectID,
 	}
 	if _, err := collection.InsertOne(context.TODO(), sa); err != nil {
 		fmt.Println("❌ Failed to seed SA user:", err)

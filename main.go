@@ -10,6 +10,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func main() {
@@ -28,7 +29,7 @@ func main() {
 	unitID := seed.SeedDefaultUnit()
 	seed.SeedRoleGroups(unitID)
 	seed.SeedAdminUser(unitID)
-	seed.SeedSAUser(unitID)
+	seed.SeedSAUser(primitive.NilObjectID)
 	seed.SeedDefaultUser(unitID)
 	seed.SeedMenus(unitID)
 
