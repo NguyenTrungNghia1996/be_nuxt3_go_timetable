@@ -27,7 +27,7 @@ func main() {
 	// Seed default accounts if needed
 	seed.SeedRoleGroups()
 	seed.SeedAdminUser()
-	seed.SeedDefaultUser()
+	// seed.SeedDefaultUser()
 	seed.SeedMenus()
 
 	app := fiber.New()

@@ -39,27 +39,27 @@ func SeedAdminUser() {
 }
 
 // SeedDefaultUser creates a regular user account if not already present.
-func SeedDefaultUser() {
-	collection := config.DB.Collection("users")
-	var existing models.User
-	err := collection.FindOne(context.TODO(), bson.M{"username": "user"}).Decode(&existing)
-	if err != mongo.ErrNoDocuments {
-		fmt.Println("✅ Regular user already exists.")
-		return
-	}
-	password, _ := utils.HashPassword("user123")
-	user := models.User{
-		Username:   "user",
-		Password:   password,
-		Name:       "Default User",
-		UrlAvatar:  "",
-		RoleGroups: []primitive.ObjectID{},
-	}
+// func SeedDefaultUser() {
+// 	collection := config.DB.Collection("users")
+// 	var existing models.User
+// 	err := collection.FindOne(context.TODO(), bson.M{"username": "user"}).Decode(&existing)
+// 	if err != mongo.ErrNoDocuments {
+// 		fmt.Println("✅ Regular user already exists.")
+// 		return
+// 	}
+// 	password, _ := utils.HashPassword("user123")
+// 	user := models.User{
+// 		Username:   "user",
+// 		Password:   password,
+// 		Name:       "Default User",
+// 		UrlAvatar:  "",
+// 		RoleGroups: []primitive.ObjectID{},
+// 	}
 
-	_, err = collection.InsertOne(context.TODO(), user)
-	if err != nil {
-		fmt.Println("❌ Failed to seed user:", err)
-		return
-	}
-	fmt.Println("🚀 Regular user seeded successfully: username=user password=user123")
-}
+// 	_, err = collection.InsertOne(context.TODO(), user)
+// 	if err != nil {
+// 		fmt.Println("❌ Failed to seed user:", err)
+// 		return
+// 	}
+// 	fmt.Println("🚀 Regular user seeded successfully: username=user password=user123")
+// }
