@@ -1,10 +1,8 @@
 # Go Fiber Template
 
-This project provides a starting point for building REST APIs with
-[Fiber](https://github.com/gofiber/fiber). It includes basic user
-authentication and MongoDB integration.
-Users now store a `name` field and belong to role groups for authorization.
-Admins can manage role groups with dedicated CRUD endpoints.
+This project provides a minimal REST API built with
+[Fiber](https://github.com/gofiber/fiber). Only user login and image
+uploads to an S3 compatible service remain.
 
 ## Running locally
 
@@ -24,5 +22,35 @@ assumes two variables:
 - `baseUrl` – base address of your running server, e.g. `http://localhost:4000`
 - `token` – JWT obtained from the `Login` request
 
-The collection contains examples for logging in, retrieving and updating the
-current user, and managing users as an admin.
+The collection contains examples for logging in and obtaining presigned URLs
+for uploading images.
+
+To fetch unit details by sub-domain, send a GET request to
+`/api/units/by_subdomain?sub_domain=yourname` without authentication. The
+response includes the unit's name, logo and sub-domain. If the sub-domain does
+not exist, the API returns an error message "sub domain not found".
+
+When logging in, include the unit's sub-domain along with the username and password:
+
+```json
+{
+  "username": "admin",
+  "password": "admin123",
+  "sub_domain": "admin"
+}
+```
+
+The response includes the user's `unit_id` and an `is_admin` flag. If you pass
+`"admin"` as the sub-domain, the credentials will be checked against service
+accounts instead of regular users. A default admin service account is seeded
+with name `sa` and password `sa123`.
+
+Both the unit and service-account list endpoints support optional search and
+pagination:
+
+```
+GET /api/units?page=1&limit=20&search=demo
+GET /api/service_accounts?page=1&limit=20&search=sa
+```
+
+If `page` or `limit` are omitted the full list is returned.

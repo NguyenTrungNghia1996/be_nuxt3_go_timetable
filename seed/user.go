@@ -21,13 +21,15 @@ func SeedAdminUser() {
 		return
 	}
 	password, _ := utils.HashPassword("admin123")
-	groupID, _ := primitive.ObjectIDFromHex("685d01ab5e17ba55d0e349f2")
+	unitID, _ := primitive.ObjectIDFromHex("687f569bcd2015c348afcc27")
 	admin := models.User{
-		Username:   "admin",
-		Password:   password,
-		Name:       "Administrator",
-		UrlAvatar:  "",
-		RoleGroups: []primitive.ObjectID{groupID},
+		Username:  "admin",
+		Password:  password,
+		Name:      "Administrator",
+		UrlAvatar: "",
+		Active:    true,
+		UnitID:    unitID,
+		IsAdmin:   true,
 	}
 
 	_, err = collection.InsertOne(context.TODO(), admin)
@@ -48,13 +50,12 @@ func SeedAdminUser() {
 // 		return
 // 	}
 // 	password, _ := utils.HashPassword("user123")
-// 	user := models.User{
-// 		Username:   "user",
-// 		Password:   password,
-// 		Name:       "Default User",
-// 		UrlAvatar:  "",
-// 		RoleGroups: []primitive.ObjectID{},
-// 	}
+//      user := models.User{
+//              Username:  "user",
+//              Password:  password,
+//              Name:      "Default User",
+//              UrlAvatar: "",
+//      }
 
 // 	_, err = collection.InsertOne(context.TODO(), user)
 // 	if err != nil {
