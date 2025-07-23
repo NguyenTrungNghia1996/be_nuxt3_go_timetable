@@ -19,7 +19,7 @@ func Setup(app *fiber.App, db *mongo.Database) {
 	authCtrl := controllers.NewAuthController(userRepo, unitRepo, saRepo)
 	unitCtrl := controllers.NewUnitController(unitRepo)
 	saCtrl := controllers.NewServiceAccountController(saRepo)
-	menuCtrl := controllers.NewMenuController(menuRepo)
+	menuCtrl := controllers.NewMenuController(menuRepo, userRepo, saRepo)
 
 	// Public routes do not require authentication
 	app.Post("/login", authCtrl.Login)
@@ -47,4 +47,6 @@ func Setup(app *fiber.App, db *mongo.Database) {
 	menus.Post("", menuCtrl.CreateMenu)
 	menus.Put("", menuCtrl.UpdateMenu)
 	menus.Delete("", menuCtrl.DeleteMenu)
+
+	api.Get("/menus/by_token", menuCtrl.GetMenusByToken)
 }

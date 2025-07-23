@@ -24,19 +24,61 @@ func (r *MenuRepository) Create(ctx context.Context, menu *models.Menu) error {
 	return err
 }
 
-// GetAll returns menus optionally filtered by a search keyword and SA flag.
-// If isSA is nil, menus with is_sa=true are excluded from the result.
-// If isSA is true, only menus with is_sa=true are returned.
-func (r *MenuRepository) GetAll(ctx context.Context, search string, isSA *bool) ([]models.Menu, error) {
+// GetAll returns menus optionally filtered by a search keyword.
+func (r *MenuRepository) GetAll(ctx context.Context, search string) ([]models.Menu, error) {
 	filter := bson.M{}
 	if search != "" {
 		filter["title"] = bson.M{"$regex": search, "$options": "i"}
 	}
-	if isSA == nil {
-		// default behaviour: exclude SA menus
-		filter["is_sa"] = bson.M{"$ne": true}
-	} else {
-		filter["is_sa"] = *isSA
+
+	cursor, err := r.collection.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var menus []models.Menu
+	for cursor.Next(ctx) {
+		var m models.Menu
+		if err := cursor.Decode(&m); err != nil {
+			return nil, err
+		}
+		menus = append(menus, m)
+	}
+	return menus, nil
+}
+
+// GetSAMenus returns menus reserved for service accounts.
+func (r *MenuRepository) GetSAMenus(ctx context.Context) ([]models.Menu, error) {
+	cursor, err := r.collection.Find(ctx, bson.M{"is_sa": true})
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var menus []models.Menu
+	for cursor.Next(ctx) {
+		var m models.Menu
+		if err := cursor.Decode(&m); err != nil {
+			return nil, err
+		}
+		menus = append(menus, m)
+	}
+	return menus, nil
+}
+
+// GetUnitMenus returns menus for a specific unit.
+// Global menus without a unit are also included.
+func (r *MenuRepository) GetUnitMenus(ctx context.Context, unitID primitive.ObjectID, isAdmin bool) ([]models.Menu, error) {
+	filter := bson.M{
+		"is_sa": false,
+		"$or": []bson.M{
+			{"unit_id": unitID},
+			{"unit_id": bson.M{"$exists": false}},
+		},
+	}
+	if !isAdmin {
+		filter["is_admin"] = false
 	}
 
 	cursor, err := r.collection.Find(ctx, filter)
