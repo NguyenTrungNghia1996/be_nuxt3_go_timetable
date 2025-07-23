@@ -449,6 +449,86 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Menus",
+      "item": [
+        {
+          "name": "List Menus",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/menus?search=dashboard",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "menus"],
+              "query": [{"key": "search", "value": "dashboard"}]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Menu",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Dashboard\",\n  \"key\": \"dashboard\",\n  \"url\": \"/dashboard\",\n  \"icon\": \"home\",\n  \"parent_Id\": \"\",\n  \"permissionBit\": 1,\n  \"unit_id\": \"abcdef1234567890\",\n  \"is_sa\": false,\n  \"is_admin\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/menus",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "menus"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Menu",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"abcdef1234567890\",\n  \"title\": \"Dashboard\",\n  \"key\": \"dashboard\",\n  \"url\": \"/dashboard\",\n  \"icon\": \"home\",\n  \"parent_Id\": \"\",\n  \"permissionBit\": 1,\n  \"unit_id\": \"abcdef1234567890\",\n  \"is_sa\": false,\n  \"is_admin\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/menus",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "menus"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Menu",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/menus?id=abcdef1234567890",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "menus"],
+              "query": [{"key": "id", "value": "abcdef1234567890"}]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "variable": [
