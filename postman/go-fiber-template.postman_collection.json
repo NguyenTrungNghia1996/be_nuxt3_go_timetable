@@ -139,13 +139,18 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/units",
+              "raw": "{{baseUrl}}/api/units?page=1&limit=10&search=demo",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
                 "units"
+              ],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "10"},
+                {"key": "search", "value": "demo"}
               ]
             }
           },
@@ -295,27 +300,32 @@
     {
       "name": "Service Accounts",
       "item": [
-        {
-          "name": "List Service Accounts",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/api/service_accounts",
-              "host": [
-                "{{baseUrl}}"
+          {
+            "name": "List Service Accounts",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                }
               ],
-              "path": [
-                "api",
-                "service_accounts"
-              ]
-            }
-          },
+              "url": {
+                "raw": "{{baseUrl}}/api/service_accounts?page=1&limit=10&search=sa",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "service_accounts"
+                ],
+                "query": [
+                  {"key": "page", "value": "1"},
+                  {"key": "limit", "value": "10"},
+                  {"key": "search", "value": "sa"}
+                ]
+              }
+            },
           "response": []
         },
         {

@@ -35,13 +35,25 @@ func (r *ServiceAccountRepository) IsUsernameExists(ctx context.Context, usernam
 	return count > 0, nil
 }
 
-func (r *ServiceAccountRepository) GetAll(ctx context.Context, page, limit int64) ([]models.ServiceAccount, int64, error) {
+func (r *ServiceAccountRepository) GetAll(ctx context.Context, search string, page, limit int64) ([]models.ServiceAccount, int64, error) {
+	filter := bson.M{}
+	if search != "" {
+		regex := bson.M{"$regex": search, "$options": "i"}
+		filter["$or"] = []bson.M{
+			{"username": regex},
+			{"name": regex},
+		}
+	}
+
 	projection := bson.M{"password": 0}
 	opts := options.Find().SetProjection(projection)
 	if limit > 0 {
+		if page <= 0 {
+			page = 1
+		}
 		opts.SetLimit(limit).SetSkip((page - 1) * limit)
 	}
-	cursor, err := r.collection.Find(ctx, bson.M{}, opts)
+	cursor, err := r.collection.Find(ctx, filter, opts)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -55,7 +67,7 @@ func (r *ServiceAccountRepository) GetAll(ctx context.Context, page, limit int64
 		}
 		items = append(items, sa)
 	}
-	total, err := r.collection.CountDocuments(ctx, bson.M{})
+	total, err := r.collection.CountDocuments(ctx, filter)
 	if err != nil {
 		return nil, 0, err
 	}

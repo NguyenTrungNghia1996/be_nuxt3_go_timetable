@@ -76,9 +76,10 @@ func (ctrl *ServiceAccountController) List(c *fiber.Ctx) error {
 			Data:    item,
 		})
 	}
-	page := c.QueryInt("page", 1)
-	limit := c.QueryInt("limit", 10)
-	items, total, err := ctrl.Repo.GetAll(c.Context(), int64(page), int64(limit))
+	search := c.Query("search")
+	page := c.QueryInt("page", 0)
+	limit := c.QueryInt("limit", 0)
+	items, total, err := ctrl.Repo.GetAll(c.Context(), search, int64(page), int64(limit))
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(models.APIResponse{
 			Status:  "error",

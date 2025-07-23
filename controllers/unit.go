@@ -72,9 +72,10 @@ func (ctrl *UnitController) List(c *fiber.Ctx) error {
 		})
 	}
 
-	page := c.QueryInt("page", 1)
-	limit := c.QueryInt("limit", 10)
-	units, total, err := ctrl.Repo.GetAll(c.Context(), int64(page), int64(limit))
+	search := c.Query("search")
+	page := c.QueryInt("page", 0)
+	limit := c.QueryInt("limit", 0)
+	units, total, err := ctrl.Repo.GetAll(c.Context(), search, int64(page), int64(limit))
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(models.APIResponse{
 			Status:  "error",

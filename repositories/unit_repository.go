@@ -26,12 +26,24 @@ func (r *UnitRepository) Create(ctx context.Context, unit *models.Unit) error {
 	return err
 }
 
-func (r *UnitRepository) GetAll(ctx context.Context, page, limit int64) ([]models.Unit, int64, error) {
+func (r *UnitRepository) GetAll(ctx context.Context, search string, page, limit int64) ([]models.Unit, int64, error) {
+	filter := bson.M{}
+	if search != "" {
+		regex := bson.M{"$regex": search, "$options": "i"}
+		filter["$or"] = []bson.M{
+			{"name": regex},
+			{"sub_domain": regex},
+		}
+	}
+
 	opts := options.Find()
 	if limit > 0 {
+		if page <= 0 {
+			page = 1
+		}
 		opts.SetLimit(limit).SetSkip((page - 1) * limit)
 	}
-	cursor, err := r.collection.Find(ctx, bson.M{}, opts)
+	cursor, err := r.collection.Find(ctx, filter, opts)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -45,7 +57,7 @@ func (r *UnitRepository) GetAll(ctx context.Context, page, limit int64) ([]model
 		}
 		units = append(units, t)
 	}
-	total, err := r.collection.CountDocuments(ctx, bson.M{})
+	total, err := r.collection.CountDocuments(ctx, filter)
 	if err != nil {
 		return nil, 0, err
 	}
