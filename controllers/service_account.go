@@ -3,6 +3,7 @@ package controllers
 import (
 	"go-fiber-api/models"
 	"go-fiber-api/repositories"
+	"go-fiber-api/utils"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -27,6 +28,10 @@ func (ctrl *ServiceAccountController) Create(c *fiber.Ctx) error {
 	if input.Active == false {
 		input.Active = true
 	}
+	if input.Password != "" {
+		hashed, _ := utils.HashPassword(input.Password)
+		input.Password = hashed
+	}
 	if err := ctrl.Repo.Create(c.Context(), &input); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(models.APIResponse{
 			Status:  "error",
@@ -34,6 +39,7 @@ func (ctrl *ServiceAccountController) Create(c *fiber.Ctx) error {
 			Data:    err.Error(),
 		})
 	}
+	input.Password = ""
 	return c.Status(fiber.StatusCreated).JSON(models.APIResponse{
 		Status:  "success",
 		Message: "Service account created",
@@ -94,6 +100,10 @@ func (ctrl *ServiceAccountController) Update(c *fiber.Ctx) error {
 		})
 	}
 	id := input.ID.Hex()
+	if input.Password != "" {
+		hashed, _ := utils.HashPassword(input.Password)
+		input.Password = hashed
+	}
 	if err := ctrl.Repo.Update(c.Context(), id, &input); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(models.APIResponse{
 			Status:  "error",
@@ -101,6 +111,7 @@ func (ctrl *ServiceAccountController) Update(c *fiber.Ctx) error {
 			Data:    err.Error(),
 		})
 	}
+	input.Password = ""
 	return c.JSON(models.APIResponse{
 		Status:  "success",
 		Message: "Service account updated",

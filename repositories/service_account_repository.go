@@ -28,7 +28,8 @@ func (r *ServiceAccountRepository) Create(ctx context.Context, sa *models.Servic
 }
 
 func (r *ServiceAccountRepository) GetAll(ctx context.Context, page, limit int64) ([]models.ServiceAccount, int64, error) {
-	opts := options.Find()
+	projection := bson.M{"password": 0}
+	opts := options.Find().SetProjection(projection)
 	if limit > 0 {
 		opts.SetLimit(limit).SetSkip((page - 1) * limit)
 	}
@@ -59,15 +60,15 @@ func (r *ServiceAccountRepository) FindByID(ctx context.Context, id string) (*mo
 		return nil, err
 	}
 	var sa models.ServiceAccount
-	if err := r.collection.FindOne(ctx, bson.M{"_id": objID}).Decode(&sa); err != nil {
+	if err := r.collection.FindOne(ctx, bson.M{"_id": objID}, options.FindOne().SetProjection(bson.M{"password": 0})).Decode(&sa); err != nil {
 		return nil, err
 	}
 	return &sa, nil
 }
 
-func (r *ServiceAccountRepository) FindByTokenHash(ctx context.Context, hash string) (*models.ServiceAccount, error) {
+func (r *ServiceAccountRepository) FindByName(ctx context.Context, name string) (*models.ServiceAccount, error) {
 	var sa models.ServiceAccount
-	if err := r.collection.FindOne(ctx, bson.M{"token_hash": hash}).Decode(&sa); err != nil {
+	if err := r.collection.FindOne(ctx, bson.M{"name": name}).Decode(&sa); err != nil {
 		return nil, err
 	}
 	return &sa, nil
@@ -78,7 +79,7 @@ func (r *ServiceAccountRepository) Update(ctx context.Context, id string, sa *mo
 	if err != nil {
 		return err
 	}
-	update := bson.M{"$set": bson.M{"name": sa.Name, "token_hash": sa.TokenHash, "scopes": sa.Scopes, "active": sa.Active}}
+	update := bson.M{"$set": bson.M{"name": sa.Name, "password": sa.Password, "active": sa.Active}}
 	_, err = r.collection.UpdateByID(ctx, objID, update)
 	return err
 }

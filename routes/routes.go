@@ -14,7 +14,7 @@ func Setup(app *fiber.App, db *mongo.Database) {
 	userRepo := repositories.NewUserRepository(db)
 	unitRepo := repositories.NewUnitRepository(db)
 	saRepo := repositories.NewServiceAccountRepository(db)
-	authCtrl := controllers.NewAuthController(userRepo, unitRepo)
+	authCtrl := controllers.NewAuthController(userRepo, unitRepo, saRepo)
 	unitCtrl := controllers.NewUnitController(unitRepo)
 	saCtrl := controllers.NewServiceAccountController(saRepo)
 

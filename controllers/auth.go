@@ -14,11 +14,12 @@ import (
 type AuthController struct {
 	UserRepo *repositories.UserRepository
 	UnitRepo *repositories.UnitRepository
+	SARepo   *repositories.ServiceAccountRepository
 }
 
 // NewAuthController creates a controller with the provided user repository.
-func NewAuthController(userRepo *repositories.UserRepository, unitRepo *repositories.UnitRepository) *AuthController {
-	return &AuthController{UserRepo: userRepo, UnitRepo: unitRepo}
+func NewAuthController(userRepo *repositories.UserRepository, unitRepo *repositories.UnitRepository, saRepo *repositories.ServiceAccountRepository) *AuthController {
+	return &AuthController{UserRepo: userRepo, UnitRepo: unitRepo, SARepo: saRepo}
 }
 
 // Login authenticates a user and returns a signed JWT on success.
@@ -41,6 +42,30 @@ func (ctrl *AuthController) Login(c *fiber.Ctx) error {
 			Status:  "error",
 			Message: "Missing sub_domain",
 			Data:    nil,
+		})
+	}
+
+	if input.SubDomain == "admin" {
+		sa, err := ctrl.SARepo.FindByName(c.Context(), input.Username)
+		if err != nil || !sa.Active || !utils.CheckPasswordHash(input.Password, sa.Password) {
+			return c.Status(fiber.StatusUnauthorized).JSON(models.APIResponse{
+				Status:  "error",
+				Message: "Invalid credentials",
+				Data:    nil,
+			})
+		}
+		token, _ := utils.GenerateJWT(sa.ID.Hex())
+		s := fiber.Map{
+			"id":   sa.ID.Hex(),
+			"name": sa.Name,
+		}
+		return c.JSON(models.APIResponse{
+			Status:  "success",
+			Message: "Login successful",
+			Data: fiber.Map{
+				"token":           token,
+				"service_account": s,
+			},
 		})
 	}
 
