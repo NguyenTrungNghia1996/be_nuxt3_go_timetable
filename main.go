@@ -28,6 +28,7 @@ func main() {
 	seed.SeedAdminUnit()
 	seed.SeedAdminUser()
 	seed.SeedAdminServiceAccount()
+	seed.SeedMenus()
 
 	app := fiber.New()
 	app.Use(cors.New())

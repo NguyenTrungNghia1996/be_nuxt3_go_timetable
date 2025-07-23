@@ -8,7 +8,6 @@ import (
 	"go-fiber-api/utils"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -21,7 +20,7 @@ func SeedAdminUser() {
 		return
 	}
 	password, _ := utils.HashPassword("admin123")
-	unitID, _ := primitive.ObjectIDFromHex("687f569bcd2015c348afcc27")
+	unitID := AdminUnitID
 	admin := models.User{
 		Username:  "admin",
 		Password:  password,
