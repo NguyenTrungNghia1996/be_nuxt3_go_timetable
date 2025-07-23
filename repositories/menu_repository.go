@@ -24,11 +24,19 @@ func (r *MenuRepository) Create(ctx context.Context, menu *models.Menu) error {
 	return err
 }
 
-// GetAll returns menus optionally filtered by a search keyword.
-func (r *MenuRepository) GetAll(ctx context.Context, search string) ([]models.Menu, error) {
+// GetAll returns menus optionally filtered by a search keyword and SA flag.
+// If isSA is nil, menus with is_sa=true are excluded from the result.
+// If isSA is true, only menus with is_sa=true are returned.
+func (r *MenuRepository) GetAll(ctx context.Context, search string, isSA *bool) ([]models.Menu, error) {
 	filter := bson.M{}
 	if search != "" {
 		filter["title"] = bson.M{"$regex": search, "$options": "i"}
+	}
+	if isSA == nil {
+		// default behaviour: exclude SA menus
+		filter["is_sa"] = bson.M{"$ne": true}
+	} else {
+		filter["is_sa"] = *isSA
 	}
 
 	cursor, err := r.collection.Find(ctx, filter)

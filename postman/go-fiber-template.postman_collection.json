@@ -464,10 +464,13 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/menus?search=dashboard",
+              "raw": "{{baseUrl}}/api/menus?search=dashboard&is_sa=true",
               "host": ["{{baseUrl}}"],
               "path": ["api", "menus"],
-              "query": [{"key": "search", "value": "dashboard"}]
+              "query": [
+                {"key": "search", "value": "dashboard"},
+                {"key": "is_sa", "value": "true"}
+              ]
             }
           },
           "response": []

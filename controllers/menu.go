@@ -5,6 +5,7 @@ import (
 	"go-fiber-api/repositories"
 
 	"github.com/gofiber/fiber/v2"
+	"strings"
 )
 
 // MenuController handles menu CRUD endpoints.
@@ -46,7 +47,20 @@ func (ctrl *MenuController) CreateMenu(c *fiber.Ctx) error {
 // GetMenus returns a list of menus optionally filtered by search keyword.
 func (ctrl *MenuController) GetMenus(c *fiber.Ctx) error {
 	search := c.Query("search")
-	menus, err := ctrl.Repo.GetAll(c.Context(), search)
+
+	// Determine SA filter
+	var isSA *bool
+	if q := c.Query("is_sa"); q != "" {
+		if strings.ToLower(q) == "true" {
+			t := true
+			isSA = &t
+		} else {
+			f := false
+			isSA = &f
+		}
+	}
+
+	menus, err := ctrl.Repo.GetAll(c.Context(), search, isSA)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(models.APIResponse{
 			Status:  "error",
