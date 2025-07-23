@@ -46,7 +46,7 @@ func (ctrl *AuthController) Login(c *fiber.Ctx) error {
 	}
 
 	if input.SubDomain == "admin" {
-		sa, err := ctrl.SARepo.FindByName(c.Context(), input.Username)
+		sa, err := ctrl.SARepo.FindByUsername(c.Context(), input.Username)
 		if err != nil || !sa.Active || !utils.CheckPasswordHash(input.Password, sa.Password) {
 			return c.Status(fiber.StatusUnauthorized).JSON(models.APIResponse{
 				Status:  "error",
@@ -56,8 +56,9 @@ func (ctrl *AuthController) Login(c *fiber.Ctx) error {
 		}
 		token, _ := utils.GenerateJWT(sa.ID.Hex())
 		s := fiber.Map{
-			"id":   sa.ID.Hex(),
-			"name": sa.Name,
+			"id":       sa.ID.Hex(),
+			"username": sa.Username,
+			"name":     sa.Name,
 		}
 		return c.JSON(models.APIResponse{
 			Status:  "success",

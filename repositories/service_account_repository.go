@@ -27,6 +27,14 @@ func (r *ServiceAccountRepository) Create(ctx context.Context, sa *models.Servic
 	return err
 }
 
+func (r *ServiceAccountRepository) IsUsernameExists(ctx context.Context, username string) (bool, error) {
+	count, err := r.collection.CountDocuments(ctx, bson.M{"username": username})
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+
 func (r *ServiceAccountRepository) GetAll(ctx context.Context, page, limit int64) ([]models.ServiceAccount, int64, error) {
 	projection := bson.M{"password": 0}
 	opts := options.Find().SetProjection(projection)
@@ -66,9 +74,9 @@ func (r *ServiceAccountRepository) FindByID(ctx context.Context, id string) (*mo
 	return &sa, nil
 }
 
-func (r *ServiceAccountRepository) FindByName(ctx context.Context, name string) (*models.ServiceAccount, error) {
+func (r *ServiceAccountRepository) FindByUsername(ctx context.Context, username string) (*models.ServiceAccount, error) {
 	var sa models.ServiceAccount
-	if err := r.collection.FindOne(ctx, bson.M{"name": name}).Decode(&sa); err != nil {
+	if err := r.collection.FindOne(ctx, bson.M{"username": username}).Decode(&sa); err != nil {
 		return nil, err
 	}
 	return &sa, nil
@@ -79,7 +87,11 @@ func (r *ServiceAccountRepository) Update(ctx context.Context, id string, sa *mo
 	if err != nil {
 		return err
 	}
-	update := bson.M{"$set": bson.M{"name": sa.Name, "password": sa.Password, "active": sa.Active}}
+	set := bson.M{"name": sa.Name, "url_avatar": sa.UrlAvatar, "active": sa.Active}
+	if sa.Password != "" {
+		set["password"] = sa.Password
+	}
+	update := bson.M{"$set": set}
 	_, err = r.collection.UpdateByID(ctx, objID, update)
 	return err
 }

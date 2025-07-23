@@ -33,7 +33,7 @@ func Setup(app *fiber.App, db *mongo.Database) {
 	units.Put("", unitCtrl.Update)
 	units.Delete("", unitCtrl.Delete)
 
-	sas := api.Group("/service_accounts")
+	sas := api.Group("/service_accounts", middleware.ServiceAccount(saRepo))
 	sas.Get("", saCtrl.List)
 	sas.Post("", saCtrl.Create)
 	sas.Put("", saCtrl.Update)

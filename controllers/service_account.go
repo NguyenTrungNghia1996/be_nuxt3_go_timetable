@@ -25,7 +25,20 @@ func (ctrl *ServiceAccountController) Create(c *fiber.Ctx) error {
 			Data:    nil,
 		})
 	}
-	if input.Active == false {
+	if exists, err := ctrl.Repo.IsUsernameExists(c.Context(), input.Username); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(models.APIResponse{
+			Status:  "error",
+			Message: "Failed to create service account",
+			Data:    err.Error(),
+		})
+	} else if exists {
+		return c.Status(fiber.StatusBadRequest).JSON(models.APIResponse{
+			Status:  "error",
+			Message: "username exists",
+			Data:    nil,
+		})
+	}
+	if !input.Active {
 		input.Active = true
 	}
 	if input.Password != "" {

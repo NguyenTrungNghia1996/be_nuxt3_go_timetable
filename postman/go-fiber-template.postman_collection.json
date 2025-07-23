@@ -336,7 +336,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"My App\",\n  \"password\": \"secret\",\n  \"active\": true\n}"
+              "raw": "{\n  \"username\": \"sa\",\n  \"name\": \"My App\",\n  \"url_avatar\": \"http://example.com/avatar.png\",\n  \"password\": \"secret\",\n  \"active\": true\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/service_accounts",
@@ -396,7 +396,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": \"abcdef1234567890\",\n  \"name\": \"Updated\",\n  \"password\": \"secret\",\n  \"active\": true\n}"
+              "raw": "{\n  \"id\": \"abcdef1234567890\",\n  \"name\": \"Updated\",\n  \"url_avatar\": \"http://example.com/avatar.png\",\n  \"password\": \"secret\",\n  \"active\": true\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/service_accounts",
