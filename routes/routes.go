@@ -13,8 +13,10 @@ func Setup(app *fiber.App, db *mongo.Database) {
 	// Initialize repositories and controllers once so they can be reused
 	userRepo := repositories.NewUserRepository(db)
 	unitRepo := repositories.NewUnitRepository(db)
+	saRepo := repositories.NewServiceAccountRepository(db)
 	authCtrl := controllers.NewAuthController(userRepo, unitRepo)
 	unitCtrl := controllers.NewUnitController(unitRepo)
+	saCtrl := controllers.NewServiceAccountController(saRepo)
 
 	// Public routes do not require authentication
 	app.Post("/login", authCtrl.Login)
@@ -30,4 +32,10 @@ func Setup(app *fiber.App, db *mongo.Database) {
 	units.Post("", unitCtrl.Create)
 	units.Put("", unitCtrl.Update)
 	units.Delete("", unitCtrl.Delete)
+
+	sas := api.Group("/service_accounts")
+	sas.Get("", saCtrl.List)
+	sas.Post("", saCtrl.Create)
+	sas.Put("", saCtrl.Update)
+	sas.Delete("", saCtrl.Delete)
 }

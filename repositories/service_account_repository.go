@@ -1,0 +1,93 @@
+package repositories
+
+import (
+	"context"
+
+	"go-fiber-api/models"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+)
+
+type ServiceAccountRepository struct {
+	collection *mongo.Collection
+}
+
+func NewServiceAccountRepository(db *mongo.Database) *ServiceAccountRepository {
+	return &ServiceAccountRepository{collection: db.Collection("service_accounts")}
+}
+
+func (r *ServiceAccountRepository) Create(ctx context.Context, sa *models.ServiceAccount) error {
+	sa.ID = primitive.NewObjectID()
+	if !sa.Active {
+		sa.Active = true
+	}
+	_, err := r.collection.InsertOne(ctx, sa)
+	return err
+}
+
+func (r *ServiceAccountRepository) GetAll(ctx context.Context, page, limit int64) ([]models.ServiceAccount, int64, error) {
+	opts := options.Find()
+	if limit > 0 {
+		opts.SetLimit(limit).SetSkip((page - 1) * limit)
+	}
+	cursor, err := r.collection.Find(ctx, bson.M{}, opts)
+	if err != nil {
+		return nil, 0, err
+	}
+	defer cursor.Close(ctx)
+
+	var items []models.ServiceAccount
+	for cursor.Next(ctx) {
+		var sa models.ServiceAccount
+		if err := cursor.Decode(&sa); err != nil {
+			return nil, 0, err
+		}
+		items = append(items, sa)
+	}
+	total, err := r.collection.CountDocuments(ctx, bson.M{})
+	if err != nil {
+		return nil, 0, err
+	}
+	return items, total, nil
+}
+
+func (r *ServiceAccountRepository) FindByID(ctx context.Context, id string) (*models.ServiceAccount, error) {
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+	var sa models.ServiceAccount
+	if err := r.collection.FindOne(ctx, bson.M{"_id": objID}).Decode(&sa); err != nil {
+		return nil, err
+	}
+	return &sa, nil
+}
+
+func (r *ServiceAccountRepository) FindByTokenHash(ctx context.Context, hash string) (*models.ServiceAccount, error) {
+	var sa models.ServiceAccount
+	if err := r.collection.FindOne(ctx, bson.M{"token_hash": hash}).Decode(&sa); err != nil {
+		return nil, err
+	}
+	return &sa, nil
+}
+
+func (r *ServiceAccountRepository) Update(ctx context.Context, id string, sa *models.ServiceAccount) error {
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+	update := bson.M{"$set": bson.M{"name": sa.Name, "token_hash": sa.TokenHash, "scopes": sa.Scopes, "active": sa.Active}}
+	_, err = r.collection.UpdateByID(ctx, objID, update)
+	return err
+}
+
+func (r *ServiceAccountRepository) Delete(ctx context.Context, id string) error {
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+	_, err = r.collection.DeleteOne(ctx, bson.M{"_id": objID})
+	return err
+}

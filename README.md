@@ -39,3 +39,5 @@ When logging in, include the unit's sub-domain along with the username and passw
   "sub_domain": "admin"
 }
 ```
+
+The response includes the user's `unit_id` and an `is_admin` flag.

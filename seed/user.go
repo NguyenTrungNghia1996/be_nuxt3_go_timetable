@@ -29,6 +29,7 @@ func SeedAdminUser() {
 		UrlAvatar: "",
 		Active:    true,
 		UnitID:    unitID,
+		IsAdmin:   true,
 	}
 
 	_, err = collection.InsertOne(context.TODO(), admin)

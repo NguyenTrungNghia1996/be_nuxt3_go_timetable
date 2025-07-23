@@ -11,4 +11,5 @@ type User struct {
 	UrlAvatar string             `json:"url_avatar" bson:"url_avatar"`
 	UnitID    primitive.ObjectID `json:"unit_id" bson:"unit_id"`
 	Active    bool               `json:"active" bson:"active"`
+	IsAdmin   bool               `json:"is_admin" bson:"is_admin"`
 }
