@@ -23,13 +23,13 @@ func SeedAdminUnit() {
 		return
 	}
 	// ensure we use the same ID as specified
-	unit := models.Unit{
-		ID:        id,
-		Name:      "Admin",
-		Logo:      "",
-		SubDomain: "admin",
-		Active:    true,
-	}
+       unit := models.Unit{
+               ID:        id,
+               Name:      "default units",
+               Logo:      "",
+               SubDomain: "unti1",
+               Active:    true,
+       }
 	if _, err := collection.InsertOne(context.TODO(), unit); err != nil {
 		fmt.Println("❌ Failed to seed admin unit:", err)
 		return
