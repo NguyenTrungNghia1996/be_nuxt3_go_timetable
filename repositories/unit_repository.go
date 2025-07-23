@@ -18,12 +18,12 @@ func NewUnitRepository(db *mongo.Database) *UnitRepository {
 }
 
 func (r *UnitRepository) Create(ctx context.Context, unit *models.Unit) error {
-        unit.ID = primitive.NewObjectID()
-        if !unit.Active {
-                unit.Active = true
-        }
-        _, err := r.collection.InsertOne(ctx, unit)
-        return err
+	unit.ID = primitive.NewObjectID()
+	if !unit.Active {
+		unit.Active = true
+	}
+	_, err := r.collection.InsertOne(ctx, unit)
+	return err
 }
 
 func (r *UnitRepository) GetAll(ctx context.Context, page, limit int64) ([]models.Unit, int64, error) {
@@ -74,13 +74,13 @@ func (r *UnitRepository) FindBySubDomain(ctx context.Context, subDomain string) 
 }
 
 func (r *UnitRepository) Update(ctx context.Context, id string, unit *models.Unit) error {
-        objID, err := primitive.ObjectIDFromHex(id)
-        if err != nil {
-                return err
-        }
-        update := bson.M{"$set": bson.M{"name": unit.Name, "sub_domain": unit.SubDomain, "active": unit.Active}}
-        _, err = r.collection.UpdateByID(ctx, objID, update)
-        return err
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+	update := bson.M{"$set": bson.M{"name": unit.Name, "sub_domain": unit.SubDomain, "logo": unit.Logo, "active": unit.Active}}
+	_, err = r.collection.UpdateByID(ctx, objID, update)
+	return err
 }
 
 func (r *UnitRepository) Delete(ctx context.Context, id string) error {

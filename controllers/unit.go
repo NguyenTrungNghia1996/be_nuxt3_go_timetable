@@ -126,26 +126,30 @@ func (ctrl *UnitController) GetBySubDomain(c *fiber.Ctx) error {
 		})
 	}
 
-	_, err := ctrl.Repo.FindBySubDomain(c.Context(), sub)
+	unit, err := ctrl.Repo.FindBySubDomain(c.Context(), sub)
 	if err == mongo.ErrNoDocuments {
-		return c.JSON(models.APIResponse{
-			Status:  "success",
-			Message: "sub_domain available",
-			Data:    fiber.Map{"exists": false},
+		return c.Status(fiber.StatusNotFound).JSON(models.APIResponse{
+			Status:  "error",
+			Message: "sub domain not found",
+			Data:    nil,
 		})
 	}
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(models.APIResponse{
 			Status:  "error",
-			Message: "Failed to check sub_domain",
+			Message: "Failed to fetch unit",
 			Data:    err.Error(),
 		})
 	}
 
 	return c.JSON(models.APIResponse{
 		Status:  "success",
-		Message: "sub_domain exists",
-		Data:    fiber.Map{"exists": true},
+		Message: "Unit retrieved",
+		Data: fiber.Map{
+			"name":       unit.Name,
+			"sub_domain": unit.SubDomain,
+			"logo":       unit.Logo,
+		},
 	})
 }
 

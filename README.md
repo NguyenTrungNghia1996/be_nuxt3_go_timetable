@@ -25,9 +25,10 @@ assumes two variables:
 The collection contains examples for logging in and obtaining presigned URLs
 for uploading images.
 
-To verify if a sub-domain is available, send a GET request to
+To fetch unit details by sub-domain, send a GET request to
 `/api/units/by_subdomain?sub_domain=yourname` without authentication. The
-response will indicate whether the sub-domain already exists.
+response includes the unit's name, logo and sub-domain. If the sub-domain does
+not exist, the API returns an error message "sub domain not found".
 
 When logging in, include the unit's sub-domain along with the username and password:
 

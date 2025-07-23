@@ -169,7 +169,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Acme\",\n  \"sub_domain\": \"acme\",\n  \"active\": true\n}"
+              "raw": "{\n  \"name\": \"Acme\",\n  \"sub_domain\": \"acme\",\n  \"logo\": \"\",\n  \"active\": true\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/units",
@@ -208,7 +208,7 @@
           "response": []
         },
         {
-          "name": "Check SubDomain",
+          "name": "Get Unit By SubDomain",
           "request": {
             "method": "GET",
             "header": [],
@@ -248,7 +248,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": \"abcdef1234567890\",\n  \"name\": \"Updated\",\n  \"sub_domain\": \"updated\",\n  \"active\": true\n}"
+              "raw": "{\n  \"id\": \"abcdef1234567890\",\n  \"name\": \"Updated\",\n  \"sub_domain\": \"updated\",\n  \"logo\": \"\",\n  \"active\": true\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/units",

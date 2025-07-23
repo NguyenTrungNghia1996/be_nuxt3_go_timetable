@@ -26,6 +26,7 @@ func SeedAdminUnit() {
 	unit := models.Unit{
 		ID:        id,
 		Name:      "Admin",
+		Logo:      "",
 		SubDomain: "admin",
 		Active:    true,
 	}
