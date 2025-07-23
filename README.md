@@ -43,4 +43,4 @@ When logging in, include the unit's sub-domain along with the username and passw
 The response includes the user's `unit_id` and an `is_admin` flag. If you pass
 `"admin"` as the sub-domain, the credentials will be checked against service
 accounts instead of regular users. A default admin service account is seeded
-with name `admin` and password `admin123`.
+with name `sa` and password `sa123`.
