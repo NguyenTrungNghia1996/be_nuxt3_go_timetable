@@ -109,7 +109,7 @@ func (ctrl *MenuController) GetMenusByToken(c *fiber.Ctx) error {
 
 	// treat as regular user
 	user, err := ctrl.UserRepo.FindByID(c.Context(), id)
-	if err != nil || !user.Active {
+	if err != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(models.APIResponse{
 			Status:  "error",
 			Message: "Unauthorized",
