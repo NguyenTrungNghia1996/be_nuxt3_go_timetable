@@ -27,7 +27,7 @@ func Setup(app *fiber.App, db *mongo.Database) {
 	api.Put("/presigned_url", controllers.GetUploadUrl)
 	api.Delete("/image", controllers.DeleteImage)
 
-	units := api.Group("/units")
+	units := api.Group("/units", middleware.ServiceAccount(saRepo))
 	units.Get("", unitCtrl.List)
 	units.Post("", unitCtrl.Create)
 	units.Put("", unitCtrl.Update)
