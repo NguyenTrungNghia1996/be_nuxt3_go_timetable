@@ -33,9 +33,12 @@ func (r *UserRepository) FindByUsername(ctx context.Context, username string) (*
 
 // Tạo user mới
 func (r *UserRepository) Create(ctx context.Context, user *models.User) error {
-	user.ID = primitive.NewObjectID()
-	_, err := r.collection.InsertOne(ctx, user)
-	return err
+        user.ID = primitive.NewObjectID()
+        if !user.Active {
+                user.Active = true
+        }
+        _, err := r.collection.InsertOne(ctx, user)
+        return err
 }
 
 // Kiểm tra username đã tồn tại
