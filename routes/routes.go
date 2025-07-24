@@ -17,6 +17,7 @@ func Setup(app *fiber.App, db *mongo.Database) {
 	authCtrl := controllers.NewAuthController(userRepo, unitRepo, saRepo)
 	unitCtrl := controllers.NewUnitController(unitRepo)
 	saCtrl := controllers.NewServiceAccountController(saRepo)
+	userCtrl := controllers.NewUserController(userRepo)
 
 	// Public routes do not require authentication
 	app.Post("/login", authCtrl.Login)
@@ -32,6 +33,12 @@ func Setup(app *fiber.App, db *mongo.Database) {
 	units.Post("", unitCtrl.Create)
 	units.Put("", unitCtrl.Update)
 	units.Delete("", unitCtrl.Delete)
+
+	users := api.Group("/users", middleware.AdminUser(userRepo))
+	users.Get("", userCtrl.List)
+	users.Post("", userCtrl.Create)
+	users.Put("", userCtrl.Update)
+	users.Delete("", userCtrl.Delete)
 
 	sas := api.Group("/service_accounts", middleware.ServiceAccount(saRepo))
 	sas.Get("", saCtrl.List)
