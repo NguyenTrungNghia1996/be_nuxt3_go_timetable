@@ -27,7 +27,7 @@ func SeedAdminUnit() {
                ID:        id,
                Name:      "default units",
                Logo:      "",
-               SubDomain: "unti1",
+               SubDomain: "unit",
                Active:    true,
        }
 	if _, err := collection.InsertOne(context.TODO(), unit); err != nil {
