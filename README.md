@@ -45,12 +45,13 @@ The response includes the user's `unit_id` and an `is_admin` flag. If you pass
 accounts instead of regular users. A default admin service account is seeded
 with name `sa` and password `sa123`.
 
-Both the unit and service-account list endpoints support optional search and
+The unit, service-account and user list endpoints support optional search and
 pagination:
 
 ```
 GET /api/units?page=1&limit=20&search=demo
 GET /api/service_accounts?page=1&limit=20&search=sa
+GET /api/users?page=1&limit=20&search=admin
 ```
 
 If `page` or `limit` are omitted the full list is returned.
